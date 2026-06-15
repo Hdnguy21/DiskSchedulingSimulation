@@ -1,22 +1,16 @@
-import java.util.*;
+import java.util.ArrayList;
 
 public class FCFSAlgorithm extends ScheduleAlgorithmBase {
-    public FCFSAlgorithm(List<Integer> requests, int initialPos) {
-        super(requests, initialPos);
-    }
+	public FCFSAlgorithm(int initPosition, int maxCylinders, int direction, ArrayList<Integer> q) {
+		super(initPosition, maxCylinders, direction, q);
+	}
 
-    @Override
-    public int calculateSchedule() {
-        int currentPosition = initialPosition;
-        sequence.add(currentPosition);
+	public String getName() {
+		return "FCFS";
+	}
 
-        // Process requests in FIFO order
-        for (int request : diskRequests) {
-            totalHeadMovement += calculateDistance(currentPosition, request);
-            sequence.add(request);
-            currentPosition = request;
-        }
-
-        return totalHeadMovement;
-    }
+	public void calcSequence() {
+		for (Integer next : referenceQueue)
+			seekToSector(next);
+	}
 }
