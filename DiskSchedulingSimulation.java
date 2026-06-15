@@ -1,56 +1,77 @@
-import java.util.*;
+import java.util.Scanner;
+import java.util.ArrayList;
 
 public class DiskSchedulingSimulation {
-    public static void main(String[] args) {
-        // Initialize scheduling algorithms
-        List<Integer> diskRequests = generateDiskRequests();
-        int initialPosition = 50;
+	private final static int NUM_ALGORITHMS = 10;
+	private static int maxCylinders = 0;
+	private static int initPos = 0;
+	private static ArrayList<Integer> ref = null;
 
-        System.out.println("=== Disk Scheduling Simulation ===");
-        System.out.println("Initial Head Position: " + initialPosition);
-        System.out.println("Disk Requests: " + diskRequests);
-        System.out.println("Disk Size: 0-200 cylinders\n");
+	public static void main(String[] args) {	
+		Scanner in = new Scanner(System.in);
+		System.out.print("Textbook example or Random (T or R)? ");
+		char choice = in.nextLine().toUpperCase().charAt(0);
+		
+		if (choice == 'T') {
+			maxCylinders = 200;
+			initPos = 53;
+			int[] array = { 98, 183, 37, 122, 14, 124, 65, 67 };
+			ref = new ArrayList<>();
+			for (int i = 0; i < array.length; i++)
+				ref.add(array[i]);
+		} else {
+			System.out.print("Size of Disk (cylinders)? ");
+			maxCylinders = in.nextInt();
+			initPos = (int) (Math.random() * maxCylinders);
+			System.out.print("Reference string length? ");
+			int numReferences = in.nextInt();
+			ref = makeReferenceString(numReferences, maxCylinders);
+		}
+		in.close();
+		
+		reportStats();
 
-        // Test different scheduling algorithms
-        testFCFS(diskRequests, initialPosition);
-        testSCAN(diskRequests, initialPosition);
-        testCSCAN(diskRequests, initialPosition);
-        testCLOOK(diskRequests, initialPosition);
-    }
+		ScheduleAlgorithm[] algos = new ScheduleAlgorithm[NUM_ALGORITHMS];
+		algos[0] = new FCFSAlgorithm(initPos, maxCylinders, ScheduleAlgorithm.RIGHT, ref);
+		algos[1] = new SSTFAlgorithm(initPos, maxCylinders, ScheduleAlgorithm.RIGHT, ref);
+		algos[2] = new SCANAlgorithm(initPos, maxCylinders, ScheduleAlgorithm.RIGHT, ref);
+		algos[3] = new SCANAlgorithm(initPos, maxCylinders, ScheduleAlgorithm.LEFT, ref);
+		algos[4] = new CSCANAlgorithm(initPos, maxCylinders, ScheduleAlgorithm.RIGHT, ref);
+		algos[5] = new CSCANAlgorithm(initPos, maxCylinders, ScheduleAlgorithm.LEFT, ref);
+		algos[6] = new LOOKAlgorithm(initPos, maxCylinders, ScheduleAlgorithm.RIGHT, ref);
+		algos[7] = new LOOKAlgorithm(initPos, maxCylinders, ScheduleAlgorithm.LEFT, ref);
+		algos[8] = new CLOOKAlgorithm(initPos, maxCylinders, ScheduleAlgorithm.RIGHT, ref);
+		algos[9] = new CLOOKAlgorithm(initPos, maxCylinders, ScheduleAlgorithm.LEFT, ref);
 
-    private static void testFCFS(List<Integer> requests, int initialPos) {
-        FCFSAlgorithm fcfs = new FCFSAlgorithm(requests, initialPos);
-        int totalHeadMovement = fcfs.calculateSchedule();
-        System.out.println("--- FCFS (First Come First Served) ---");
-        fcfs.displaySchedule();
-        System.out.println();
-    }
+		System.out.printf("%-6s(D) %7s   %s\n", "Algo", "Travel", "Sequence");
+		System.out.printf("=========================================================\n");
 
-    private static void testSCAN(List<Integer> requests, int initialPos) {
-        SCANAlgorithm scan = new SCANAlgorithm(requests, initialPos);
-        int totalHeadMovement = scan.calculateSchedule();
-        System.out.println("--- SCAN (Elevator Algorithm) ---");
-        scan.displaySchedule();
-        System.out.println();
-    }
+		for (int a = 0; a < NUM_ALGORITHMS; a++) {
+			ScheduleAlgorithm algo = algos[a];
+			System.out.printf("%-6s(%c) %7d   %s\n", algo.getName(), algo.getDirection() == ScheduleAlgorithm.RIGHT ? 'R' : 'L', algo.getTotalTravel(), algo.getSequence());
+		}
+	}
 
-    private static void testCSCAN(List<Integer> requests, int initialPos) {
-        CSCANAlgorithm cscan = new CSCANAlgorithm(requests, initialPos);
-        int totalHeadMovement = cscan.calculateSchedule();
-        System.out.println("--- C-SCAN (Circular SCAN) ---");
-        cscan.displaySchedule();
-        System.out.println();
-    }
+	private static ArrayList<Integer> makeReferenceString(int n, int max) {
+		ArrayList<Integer> a = new ArrayList<>();
 
-    private static void testCLOOK(List<Integer> requests, int initialPos) {
-        CLOOKAlgorithm clook = new CLOOKAlgorithm(requests, initialPos);
-        int totalHeadMovement = clook.calculateSchedule();
-        System.out.println("--- C-LOOK (Circular LOOK) ---");
-        clook.displaySchedule();
-        System.out.println();
-    }
+		for (int i = 0; i < n; i++)
+			a.add((int) (Math.random() * max));
 
-    private static List<Integer> generateDiskRequests() {
-        return Arrays.asList(98, 183, 37, 122, 14, 124, 65, 67);
-    }
+		return a;
+	}
+	
+	private static void reportStats() {
+		System.out.printf("\n=========================================================\n");
+		System.out.printf("ACO350 - Ha Uyen Nguyen\n");
+		System.out.printf("Disk Scheduling Simulation\n");
+		System.out.printf("=========================================================\n");
+		System.out.printf("   # Algorithms tested  : %d\n", NUM_ALGORITHMS);
+		System.out.printf("   # of Cylinders       : %d\n", maxCylinders);
+		System.out.printf("   Initial Head Position: %d\n", initPos);
+		System.out.printf("   Disk Access Queue    : ");
+		for (Integer i : ref)
+			System.out.printf("%d ", i);
+		System.out.printf("\n=========================================================\n");
+	}
 }
