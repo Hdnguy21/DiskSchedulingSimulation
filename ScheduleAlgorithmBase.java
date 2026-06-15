@@ -1,26 +1,45 @@
-import java.util.*;
+import java.util.ArrayList;
 
-public abstract class ScheduleAlgorithmBase {
-    protected List<Integer> diskRequests;
-    protected int initialPosition;
-    protected List<Integer> sequence;
-    protected int totalHeadMovement;
+public abstract class ScheduleAlgorithmBase implements ScheduleAlgorithm {
+	protected int position;
+	protected int distance;
+	protected int maxCylinders;
+	protected int direction;
+	protected ArrayList<Integer> referenceQueue;
+	protected String sequence;
 
-    public ScheduleAlgorithmBase(List<Integer> requests, int initialPos) {
-        this.diskRequests = new ArrayList<>(requests);
-        this.initialPosition = initialPos;
-        this.sequence = new ArrayList<>();
-        this.totalHeadMovement = 0;
-    }
+	public ScheduleAlgorithmBase(int initPosition, int maxCylinders, int direction, ArrayList<Integer> q) {
+		position = initPosition;
+		this.maxCylinders = maxCylinders;
+		this.direction = direction;
+		referenceQueue = new ArrayList<Integer>(q);
+		distance = 0;
+		sequence = initPosition + " ";
+		calcSequence();
+	}
 
-    public abstract int calculateSchedule();
+	public String getName() {
+		return "UNKWN";
+	}
 
-    public void displaySchedule() {
-        System.out.println("Scheduling Sequence: " + sequence);
-        System.out.println("Total Head Movement: " + totalHeadMovement);
-    }
+	public void calcSequence() {
+	}
 
-    protected int calculateDistance(int from, int to) {
-        return Math.abs(from - to);
-    }
+	public int getTotalTravel() {
+		return distance;
+	}
+
+	public int getDirection() {
+		return direction;
+	}
+	
+	public String getSequence() {
+		return sequence;
+	}
+
+	protected void seekToSector(int p) {
+		distance += Math.abs(position - p);
+		position = p;
+		sequence = sequence + p + " ";
+	}
 }
