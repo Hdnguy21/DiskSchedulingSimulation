@@ -1,87 +1,48 @@
 # Disk Scheduling Simulation
 
-This project implements various disk scheduling algorithms commonly used in operating systems to optimize disk head movement and improve I/O performance.
+## Course Context
+Built for ACO350 (Operating Systems Principles) at Arizona State University. The assignment required implementing 10 disk scheduling algorithm variations using a strict OOP architecture — enforcing an interface, abstract base class, and polymorphic subclasses per a mandatory UML class hierarchy.
 
-## Algorithms Implemented
+## Tech Stack
+- **Language:** Java (Standard Edition)
+- **Libraries:** java.util.ArrayList, java.util.Collections, java.util.Scanner
+- **Tools:** GNU Make, javac compiler, UNIX CLI, SSH/SCP for remote development
 
-### 1. FCFS (First Come First Served)
-- Services requests in the order they arrive
-- Simple but can result in significant head movement
-- No optimization for disk head position
+## What It Does
+Simulates how an operating system manages hard disk head movement across data tracks. Takes a list of requested disk sectors and calculates the total travel distance each algorithm requires, enabling direct performance comparison across all scheduling strategies.
 
-### 2. SCAN (Elevator Algorithm)
-- Head moves in one direction servicing all requests
-- When reaching the end, reverses direction
-- Provides better performance than FCFS
+## Algorithms Implemented (10 Variations)
+- **FCFS** — First Come First Served
+- **SSTF** — Shortest Seek Time First (greedy)
+- **SCAN (R/L)** — Elevator algorithm, both directions
+- **C-SCAN (R/L)** — Circular SCAN with loop reset
+- **LOOK (R/L)** — Boundary-optimized SCAN reversal
+- **C-LOOK (R/L)** — Circular LOOK variant
 
-### 3. C-SCAN (Circular SCAN)
-- Similar to SCAN but head returns to starting position after reaching the end
-- Provides more uniform wait times
-- Better for systems requiring fairness
+## Key Technical Features
+- Directional data partitioning — splits sector request queues into left/right sub-lists relative to dynamic disk head position
+- Cumulative head travel distance tracking using Math.abs() across all algorithm variants
+- Full traversal path history logged as string output per run
+- Dual input mode — fixed textbook data sequence or randomized simulation array via CLI loop
 
-### 4. C-LOOK (Circular LOOK)
-- Improvement over C-SCAN
-- Doesn't go all the way to disk end, only to the farthest request
-- More efficient than C-SCAN
-
-## Files
-
-- `ScheduleAlgorithmBase.java` - Abstract base class for all algorithms
-- `FCFSAlgorithm.java` - First Come First Served
-- `SCANAlgorithm.java` - Elevator Algorithm
-- `CSCANAlgorithm.java` - Circular SCAN
-- `CLOOKAlgorithm.java` - Circular LOOK
-- `DiskSchedulingSimulation.java` - Main driver class
-
-## Running the Simulation
-
-### Compile
+## How to Run
 ```bash
+# Compile
 javac *.java
-```
 
-### Run
-```bash
+# Run
 java DiskSchedulingSimulation
 ```
 
-## Example Output
-
-```
-=== Disk Scheduling Simulation ===
-Initial Head Position: 50
-Disk Requests: [98, 183, 37, 122, 14, 124, 65, 67]
-Disk Size: 0-200 cylinders
-
---- FCFS (First Come First Served) ---
-Scheduling Sequence: [50, 98, 183, 37, 122, 14, 124, 65, 67]
-Total Head Movement: 640
-
---- SCAN (Elevator Algorithm) ---
-Scheduling Sequence: [50, 65, 67, 98, 122, 124, 183, 14, 37]
-Total Head Movement: 236
-
---- C-SCAN (Circular SCAN) ---
-Scheduling Sequence: [50, 65, 67, 98, 122, 124, 183, 0, 37, 14]
-Total Head Movement: 385
-
---- C-LOOK (Circular LOOK) ---
-Scheduling Sequence: [50, 65, 67, 98, 122, 124, 183, 37, 14]
-Total Head Movement: 352
-```
-
-## Algorithm Comparison
-
-| Algorithm | Best Case | Worst Case | Average Performance |
-|-----------|-----------|------------|---------------------|
-| FCFS | Requests in order | Random scattered requests | Poor |
-| SCAN | Evenly distributed requests | Heavily loaded system | Good |
-| C-SCAN | High fairness required | Heavily one-sided requests | Very Good |
-| C-LOOK | Similar to C-SCAN | Similar to C-SCAN | Excellent |
-
-## Notes
-
-- Disk size is set to 0-200 cylinders
-- Initial head position is at cylinder 50
+## File Structure
+- `DiskSchedulingSimulation.java` — Main driver class and CLI input loop
+- `ScheduleAlgorithm.java` — Interface defining the algorithm contract
+- `ScheduleAlgorithmBase.java` — Abstract base class with shared state tracking
+- `FCFSAlgorithm.java` — First Come First Served
+- `SSTFAlgorithm.java` — Shortest Seek Time First
+- `SCANAlgorithm.java` — SCAN (Elevator) both directions
+- `CSCANAlgorithm.java` — Circular SCAN both directions
+- `LOOKAlgorithm.java` — LOOK both directions
+- `CLOOKAlgorithm.java` — Circular LOOK both directions
 - All algorithms start from the same initial position and process the same request queue
 - Total head movement is measured in cylinders
