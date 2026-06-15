@@ -24,28 +24,25 @@ This project implements various disk scheduling algorithms commonly used in oper
 - Doesn't go all the way to disk end, only to the farthest request
 - More efficient than C-SCAN
 
-## Project Structure
+## Files
 
-```
-src/
-├── ScheduleAlgorithmBase.java  (Abstract base class)
-├── FCFSAlgorithm.java
-├── SCANAlgorithm.java
-├── CSCANAlgorithm.java
-├── CLOOKAlgorithm.java
-└── DiskSchedulingSimulation.java (Main driver)
-```
+- `ScheduleAlgorithmBase.java` - Abstract base class for all algorithms
+- `FCFSAlgorithm.java` - First Come First Served
+- `SCANAlgorithm.java` - Elevator Algorithm
+- `CSCANAlgorithm.java` - Circular SCAN
+- `CLOOKAlgorithm.java` - Circular LOOK
+- `DiskSchedulingSimulation.java` - Main driver class
 
 ## Running the Simulation
 
 ### Compile
 ```bash
-javac src/*.java
+javac *.java
 ```
 
 ### Run
 ```bash
-java -cp src DiskSchedulingSimulation
+java DiskSchedulingSimulation
 ```
 
 ## Example Output
