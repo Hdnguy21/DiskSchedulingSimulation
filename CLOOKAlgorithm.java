@@ -1,57 +1,36 @@
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class CLOOKAlgorithm extends ScheduleAlgorithmBase {
-    private static final int DISK_SIZE = 200;
+   public CLOOKAlgorithm(int initPosition, int maxCylinders, int direction, ArrayList<Integer> q) {
+      super(initPosition, maxCylinders, direction, q);
+   }
 
-    public CLOOKAlgorithm(List<Integer> requests, int initialPos) {
-        super(requests, initialPos);
-    }
+   public String getName() {
+      return "C-LOOK";
+   }
 
-    @Override
-    public int calculateSchedule() {
-        // Separate requests into left and right of initial position
-        List<Integer> left = new ArrayList<>();
-        List<Integer> right = new ArrayList<>();
+   public void calcSequence() {
+      Collections.sort(referenceQueue);
+      ArrayList<Integer> left = new ArrayList<>();
+      ArrayList<Integer> right = new ArrayList<>();
 
-        for (int request : diskRequests) {
-            if (request < initialPosition) {
-                left.add(request);
-            } else {
-                right.add(request);
-            }
-        }
+      for (Integer r : referenceQueue) {
+         if (r < position) {
+            left.add(r);
+         } else {
+            right.add(r);
+         }
+      }
 
-        // Sort both lists
-        Collections.sort(left, Collections.reverseOrder());
-        Collections.sort(right);
-
-        int currentPosition = initialPosition;
-        sequence.add(currentPosition);
-
-        // Move right first
-        for (int request : right) {
-            totalHeadMovement += calculateDistance(currentPosition, request);
-            sequence.add(request);
-            currentPosition = request;
-        }
-
-        // Jump to leftmost request instead of disk end
-        if (!left.isEmpty()) {
-            int leftmost = left.get(0);
-            totalHeadMovement += calculateDistance(currentPosition, leftmost);
-            currentPosition = leftmost;
-
-            // Service left requests from highest to lowest
-            for (int i = left.size() - 1; i >= 0; i--) {
-                int request = left.get(i);
-                if (request != currentPosition) {
-                    totalHeadMovement += calculateDistance(currentPosition, request);
-                    currentPosition = request;
-                }
-                sequence.add(request);
-            }
-        }
-
-        return totalHeadMovement;
-    }
+      if (direction == ScheduleAlgorithm.RIGHT) {
+         // right side
+         for (int i = 0; i < right.size(); i++) seekToSector(right.get(i));
+         for (int i = 0; i < left.size(); i++) seekToSector(left.get(i));
+      } else {
+         // left side
+         for (int i = left.size() - 1; i >= 0; i--) seekToSector(left.get(i));
+         for (int i = right.size() - 1; i >= 0; i--) seekToSector(right.get(i));
+      }
+   }
 }
