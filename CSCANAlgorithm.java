@@ -1,56 +1,49 @@
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class CSCANAlgorithm extends ScheduleAlgorithmBase {
-    private static final int DISK_SIZE = 200;
+   public CSCANAlgorithm(int initPosition, int maxCylinders, int direction, ArrayList<Integer> q) {
+      super(initPosition, maxCylinders, direction, q);
+   }
 
-    public CSCANAlgorithm(List<Integer> requests, int initialPos) {
-        super(requests, initialPos);
-    }
+   public String getName() {
+      return "C-SCAN";
+   }
 
-    @Override
-    public int calculateSchedule() {
-        // Separate requests into left and right of initial position
-        List<Integer> left = new ArrayList<>();
-        List<Integer> right = new ArrayList<>();
+   public void calcSequence() {
+      Collections.sort(referenceQueue);
+      
+      ArrayList<Integer> left = new ArrayList<>();
+      ArrayList<Integer> right = new ArrayList<>();
 
-        for (int request : diskRequests) {
-            if (request < initialPosition) {
-                left.add(request);
-            } else {
-                right.add(request);
-            }
-        }
+      for (Integer r : referenceQueue) {
+         if (r < position) {
+            left.add(r);
+         } else {
+            right.add(r);
+         }
+      }
 
-        // Sort both lists
-        Collections.sort(left, Collections.reverseOrder());
-        Collections.sort(right);
-
-        int currentPosition = initialPosition;
-        sequence.add(currentPosition);
-
-        // Move right first to the end
-        for (int request : right) {
-            totalHeadMovement += calculateDistance(currentPosition, request);
-            sequence.add(request);
-            currentPosition = request;
-        }
-
-        // Move to the end of disk
-        totalHeadMovement += calculateDistance(currentPosition, DISK_SIZE);
-        currentPosition = DISK_SIZE;
-
-        // Jump to beginning and service left requests
-        totalHeadMovement += calculateDistance(currentPosition, 0);
-        currentPosition = 0;
-
-        // Now move right servicing left requests (in reverse order)
-        for (int i = left.size() - 1; i >= 0; i--) {
-            int request = left.get(i);
-            totalHeadMovement += calculateDistance(currentPosition, request);
-            sequence.add(request);
-            currentPosition = request;
-        }
-
-        return totalHeadMovement;
-    }
+      if (direction == ScheduleAlgorithm.RIGHT) {
+         for (int i = 0; i < right.size(); i++) {
+            seekToSector(right.get(i));
+         }
+         // Go to the very end
+         seekToSector(maxCylinders - 1);
+         seekToSector(0);
+         for (int i = 0; i < left.size(); i++) {
+            seekToSector(left.get(i));
+         }
+      } else {
+         for (int i = left.size() - 1; i >= 0; i--) {
+            seekToSector(left.get(i));
+         }
+         // Go to the very beginning
+         seekToSector(0);
+         seekToSector(maxCylinders - 1);
+         for (int i = right.size() - 1; i >= 0; i--) {
+            seekToSector(right.get(i));
+         }
+      }
+   }
 }
